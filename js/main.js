@@ -3,7 +3,15 @@
  * Vanilla JavaScript (No Build Tools Required)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function runWhenReady(fn) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fn);
+  } else {
+    fn();
+  }
+}
+
+runWhenReady(() => {
   initThemeToggle();
   initMobileMenu();
   initScrollSpy();
