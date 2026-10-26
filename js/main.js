@@ -30,7 +30,7 @@ function initThemeToggle() {
   const themeToggleBtn = document.getElementById('theme-toggle');
   if (!themeToggleBtn) return;
 
-  const currentTheme = localStorage.getItem('saoirse_cv_theme') || 
+  const currentTheme = localStorage.getItem('aires_cv_theme') || 
     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
   if (currentTheme === 'dark') {
@@ -41,19 +41,25 @@ function initThemeToggle() {
 
   updateThemeIcon(currentTheme === 'dark');
 
-  themeToggleBtn.addEventListener('click', () => {
+  const handleToggle = (e) => {
+    e.preventDefault();
     const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('saoirse_cv_theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('aires_cv_theme', isDark ? 'dark' : 'light');
     updateThemeIcon(isDark);
-    showToast(isDark ? 'Switched to Dark Mode' : 'Switched to Light Mode');
-  });
+    showToast(isDark ? 'Switched to Dark Mode ✦' : 'Switched to Light Mode ✦');
+  };
 
-  function updateThemeIcon(isDark) {
-    themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-    themeToggleBtn.innerHTML = isDark
-      ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
-  }
+  themeToggleBtn.onclick = handleToggle;
+  themeToggleBtn.ontouchend = handleToggle;
+}
+
+function updateThemeIcon(isDark) {
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  if (!themeToggleBtn) return;
+  themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  themeToggleBtn.innerHTML = isDark
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
 }
 
 /* --------------------------------------------------------------------------
@@ -235,9 +241,13 @@ function initCopyButtons() {
    -------------------------------------------------------------------------- */
 function initContactForm() {
   const form = document.getElementById('contact-form');
-  if (!form) return;
+  const successBox = document.getElementById('contact-success-box');
+  const mailtoLink = document.getElementById('contact-mailto-link');
+  const resetBtn = document.getElementById('contact-reset-btn');
 
-  form.addEventListener('submit', (e) => {
+  if (!form || !successBox) return;
+
+  form.onsubmit = (e) => {
     e.preventDefault();
 
     const name = form.querySelector('[name="name"]')?.value.trim();
@@ -250,33 +260,34 @@ function initContactForm() {
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       showToast('Please enter a valid email address.');
       return;
     }
 
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Sending...';
+    const targetEmail = 'airesjhoyjgiverola@gmail.com';
+    const mailSubject = encodeURIComponent(subjectInput || `Portfolio Inquiry from ${name}`);
+    const mailBody = encodeURIComponent(`From: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
 
-    setTimeout(() => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
+    const mailtoUrl = `mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`;
 
-      // Construct mailto link to go directly to Aires Jhoy's email
-      const targetEmail = 'airesjhoyjgiverola@gmail.com';
-      const mailSubject = encodeURIComponent(subjectInput || `Portfolio Inquiry from ${name}`);
-      const mailBody = encodeURIComponent(`From: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+    if (mailtoLink) {
+      mailtoLink.href = mailtoUrl;
+    }
 
-      window.location.href = `mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`;
+    form.style.display = 'none';
+    successBox.style.display = 'block';
+    showToast('Message ready! Click Open Email App to send.');
+  };
 
+  if (resetBtn) {
+    resetBtn.onclick = () => {
       form.reset();
-      showToast('Opening your email client to send message to Aires Jhoy...');
-    }, 600);
-  });
+      form.style.display = 'block';
+      successBox.style.display = 'none';
+    };
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -285,10 +296,14 @@ function initContactForm() {
 function initPrintButton() {
   const printBtns = document.querySelectorAll('[data-action="print-cv"]');
   printBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.onclick = (e) => {
       e.preventDefault();
-      window.print();
-    });
+      try {
+        window.print();
+      } catch (err) {
+        showToast('Please use browser menu to print/save as PDF.');
+      }
+    };
   });
 }
 
