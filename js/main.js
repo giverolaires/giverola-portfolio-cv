@@ -242,6 +242,7 @@ function initContactForm() {
 
     const name = form.querySelector('[name="name"]')?.value.trim();
     const email = form.querySelector('[name="email"]')?.value.trim();
+    const subjectInput = form.querySelector('[name="subject"]')?.value.trim();
     const message = form.querySelector('[name="message"]')?.value.trim();
 
     if (!name || !email || !message) {
@@ -256,7 +257,6 @@ function initContactForm() {
       return;
     }
 
-    // Simulated submission feedback
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
@@ -265,9 +265,17 @@ function initContactForm() {
     setTimeout(() => {
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
+
+      // Construct mailto link to go directly to Aires Jhoy's email
+      const targetEmail = 'airesjhoyjgiverola@gmail.com';
+      const mailSubject = encodeURIComponent(subjectInput || `Portfolio Inquiry from ${name}`);
+      const mailBody = encodeURIComponent(`From: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+
+      window.location.href = `mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`;
+
       form.reset();
-      showToast('Message sent! Thank you for reaching out, Aires Jhoy will get back to you soon.');
-    }, 700);
+      showToast('Opening your email client to send message to Aires Jhoy...');
+    }, 600);
   });
 }
 
