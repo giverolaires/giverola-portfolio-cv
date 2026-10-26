@@ -241,11 +241,10 @@ function initCopyButtons() {
    -------------------------------------------------------------------------- */
 function initContactForm() {
   const form = document.getElementById('contact-form');
-  const successBox = document.getElementById('contact-success-box');
-  const mailtoLink = document.getElementById('contact-mailto-link');
-  const resetBtn = document.getElementById('contact-reset-btn');
+  if (!form) return;
 
-  if (!form || !successBox) return;
+  const formCard = form.closest('.contact-form-card');
+  if (!formCard) return;
 
   form.onsubmit = (e) => {
     e.preventDefault();
@@ -272,22 +271,31 @@ function initContactForm() {
 
     const mailtoUrl = `mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`;
 
-    if (mailtoLink) {
-      mailtoLink.href = mailtoUrl;
-    }
+    // Preserve scroll position by updating innerHTML of card smoothly without collapsing layout height
+    const currentScrollY = window.scrollY;
+    formCard.innerHTML = `
+      <div style="text-align: center; padding: 2rem 1rem;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-strong); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto; font-size: 1.6rem; font-weight: 800;">✓</div>
+        <h4 style="font-size: 1.45rem; margin-bottom: 0.5rem; color: var(--text-primary);">Message Ready to Send!</h4>
+        <p style="font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 600; line-height: 1.6;">
+          Your message has been prepared for Aires Jhoy. Click below to open your email app and send it directly:
+        </p>
+        <a href="${mailtoUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="width: 100%; margin-bottom: 1rem; justify-content: center;">
+          <span>Open Email App (airesjhoyjgiverola@gmail.com) ↗</span>
+        </a>
+        <button type="button" id="contact-reset-btn" class="btn-ghost" style="width: 100%; justify-content: center;">
+          <span>Send Another Message</span>
+        </button>
+      </div>
+    `;
+    window.scrollTo(0, currentScrollY);
 
-    form.style.display = 'none';
-    successBox.style.display = 'block';
+    document.getElementById('contact-reset-btn')?.addEventListener('click', () => {
+      window.location.reload();
+    });
+
     showToast('Message ready! Click Open Email App to send.');
   };
-
-  if (resetBtn) {
-    resetBtn.onclick = () => {
-      form.reset();
-      form.style.display = 'block';
-      successBox.style.display = 'none';
-    };
-  }
 }
 
 /* --------------------------------------------------------------------------
