@@ -4,7 +4,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initPreloader();
   initThemeToggle();
   initMobileMenu();
   initScrollSpy();
@@ -15,29 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initPrintButton();
   initCertificateModal();
 });
-
-/* --------------------------------------------------------------------------
-   1. Page Preloader
-   -------------------------------------------------------------------------- */
-function initPreloader() {
-  const preloader = document.getElementById('preloader');
-  if (!preloader) return;
-
-  const hidePreloader = () => {
-    setTimeout(() => {
-      preloader.classList.add('hidden');
-    }, 200);
-  };
-
-  if (document.readyState === 'complete') {
-    hidePreloader();
-  } else {
-    window.addEventListener('load', hidePreloader);
-  }
-
-  // Fallback timeout
-  setTimeout(hidePreloader, 1000);
-}
 
 /* --------------------------------------------------------------------------
    2. Dark Mode / Theme Toggle
