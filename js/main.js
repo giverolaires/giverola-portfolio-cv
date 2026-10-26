@@ -23,18 +23,20 @@ function initPreloader() {
   const preloader = document.getElementById('preloader');
   if (!preloader) return;
 
-  window.addEventListener('load', () => {
+  const hidePreloader = () => {
     setTimeout(() => {
       preloader.classList.add('hidden');
-    }, 350);
-  });
+    }, 200);
+  };
 
-  // Fallback timeout in case window.load takes too long
-  setTimeout(() => {
-    if (!preloader.classList.contains('hidden')) {
-      preloader.classList.add('hidden');
-    }
-  }, 1500);
+  if (document.readyState === 'complete') {
+    hidePreloader();
+  } else {
+    window.addEventListener('load', hidePreloader);
+  }
+
+  // Fallback timeout
+  setTimeout(hidePreloader, 1000);
 }
 
 /* --------------------------------------------------------------------------
