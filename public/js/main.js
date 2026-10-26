@@ -46,7 +46,6 @@ function initThemeToggle() {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('aires_cv_theme', isDark ? 'dark' : 'light');
     updateThemeIcon(isDark);
-    showToast(isDark ? 'Switched to Dark Mode ✦' : 'Switched to Light Mode ✦');
   };
 
   themeToggleBtn.onclick = handleToggle;
@@ -246,6 +245,14 @@ function initContactForm() {
   const formCard = form.closest('.contact-form-card');
   if (!formCard) return;
 
+  let errorBanner = formCard.querySelector('.form-error-banner');
+  if (!errorBanner) {
+    errorBanner = document.createElement('div');
+    errorBanner.className = 'form-error-banner';
+    errorBanner.style.cssText = 'display: none; background: rgba(220, 38, 38, 0.12); border: 2px solid #ef4444; color: #b91c1c; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 700; margin-bottom: 1.25rem;';
+    form.parentNode.insertBefore(errorBanner, form);
+  }
+
   form.onsubmit = (e) => {
     e.preventDefault();
 
@@ -255,15 +262,19 @@ function initContactForm() {
     const message = form.querySelector('[name="message"]')?.value.trim();
 
     if (!name || !email || !message) {
-      showToast('Please fill out all required fields.');
+      errorBanner.textContent = 'Please fill out all required fields before sending.';
+      errorBanner.style.display = 'block';
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      showToast('Please enter a valid email address.');
+      errorBanner.textContent = 'Please enter a valid email address.';
+      errorBanner.style.display = 'block';
       return;
     }
+
+    errorBanner.style.display = 'none';
 
     const targetEmail = 'airesjhoyjgiverola@gmail.com';
     const mailSubject = encodeURIComponent(subjectInput || `Portfolio Inquiry from ${name}`);
@@ -271,7 +282,6 @@ function initContactForm() {
 
     const mailtoUrl = `mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`;
 
-    // Preserve scroll position by updating innerHTML of card smoothly without collapsing layout height
     const currentScrollY = window.scrollY;
     formCard.innerHTML = `
       <div style="text-align: center; padding: 2rem 1rem;">
@@ -293,8 +303,6 @@ function initContactForm() {
     document.getElementById('contact-reset-btn')?.addEventListener('click', () => {
       window.location.reload();
     });
-
-    showToast('Message ready! Click Open Email App to send.');
   };
 }
 
@@ -407,4 +415,3 @@ function initCertificateModal() {
     }
   });
 }
-
